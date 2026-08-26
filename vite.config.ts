@@ -145,9 +145,11 @@ function authPopupPlugin(): Plugin {
 // `0.0.0.0:8080` is the live-preview contract — don't change host/port.
 // The dev server starts once `src/router.tsx` and `src/routes/` exist — see
 // AGENTS.md § "First scaffold".
+//
+// App is deployed at domain root (ats-x.vercel.app). uxapex.com/job embeds it
+// via iframe in AppProtoNeoRouter — do not set Vite `base` / router basepath
+// to /job unless Nitro + SSR also serve that prefix end-to-end.
 export default defineConfig(({ command, isPreview }) => ({
-  // Prefix asset + public URLs with /job for the uxapex.com/job proxy.
-  base: "/job/",
   server: {
     host: "0.0.0.0",
     port: 8080,
@@ -168,11 +170,7 @@ export default defineConfig(({ command, isPreview }) => ({
     // PWA head + ?install=1 tutorial page; runs before Start/Nitro.
     grokPwaPlugin(),
     tailwindcss(),
-    tanstackStart({
-      router: {
-        basepath: "/job",
-      },
-    }),
+    tanstackStart(),
     ...(command === "build" || isPreview
       ? [
           nitro({
